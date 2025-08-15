@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Layout from './Layout';
+import Notification from './Notifications';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 const App = () => {
   const [newsList, setNewsList] = useState([]);
@@ -12,7 +15,7 @@ const App = () => {
 
   const fetchNews = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/news');
+      const res = await axios.get('http://localhost:8080/api/news');
       setNewsList(res.data);
     } catch (err) {
       console.error("Error fetching news:", err);
@@ -22,9 +25,9 @@ const App = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/news', form);
+      await axios.post('http://localhost:8080/api/news', form);
       setForm({ title: '', description: '', publishedDate: '' });
-      fetchNews(); // refresh list
+      fetchNews();
     } catch (err) {
       console.error("Error adding news:", err);
     }
@@ -32,7 +35,7 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/news/${id}`);
+      await axios.delete(`http://localhost:8080/api/news/${id}`);
       fetchNews();
     } catch (err) {
       console.error("Error deleting news:", err);
@@ -45,7 +48,8 @@ const App = () => {
       return;
     }
     try {
-      const res = await axios.get(`http://localhost:8080/news/search?query=${encodeURIComponent(query)}`);
+      const res = await axios.get(`http://localhost:8080/api/news/search?query=${encodeURIComponent(query)}`);
+
       setNewsList(res.data);
     } catch (err) {
       console.error("Error searching news:", err);
@@ -53,6 +57,8 @@ const App = () => {
   };
 
   return (
+   
+
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
       <h1>📰 News Notification App</h1>
 
@@ -100,6 +106,14 @@ const App = () => {
           </li>
         ))}
       </ul>
+      <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+        {/* <Route index element={<Notification/>} /> */}
+          <Route path="notifications" element={<Notification/>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
     </div>
   );
 };
